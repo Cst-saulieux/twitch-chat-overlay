@@ -4,9 +4,10 @@ const SUPABASE_URL = 'https://fxvoosxodlzzdmkkonee.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_ocpNFrq6bY82rN3w58yRTA_u3AVyEFK'; // La clé anon de Supabase (pas la service_role !)
 const DEFAULT_AVATAR = 'https://static-cdn.jtvnw.net/user-default-pictures-uv/75305d54-c7cc-40d1-bb60-a02c3b84b353-profile_image-300x300.png';
 
-// --- SUPABASE ---
+// --- INITIALISATION SUPABASE ---
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 const avatarCache = new Map();
 
 async function getAvatar(username) {
@@ -24,7 +25,7 @@ async function getAvatar(username) {
   return url;
 }
 
-// --- TWITCH ---
+// --- CONNEXION TWITCH ---
 const client = new tmi.Client({
   channels: [TWITCH_CHANNEL]
 });
