@@ -4,22 +4,16 @@ const SUPABASE_URL = 'https://fxvoosxodlzzdmkkonee.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_ocpNFrq6bY82rN3w58yRTA_u3AVyEFK'; // La clé anon de Supabase (pas la service_role !)
 const DEFAULT_AVATAR = 'https://static-cdn.jtvnw.net/user-default-pictures-uv/75305d54-c7cc-40d1-bb60-a02c3b84b353-profile_image-300x300.png';
 
-// --- INITIALISATION SUPABASE ---
+// --- SUPABASE ---
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// Cache mémoire pour éviter d'appeler l'API à chaque message
 const avatarCache = new Map();
 
-// Fonction pour récupérer l'avatar d'un utilisateur
 async function getAvatar(username) {
   const cleanUser = username.toLowerCase();
-  
-  if (avatarCache.has(cleanUser)) {
-    return avatarCache.get(cleanUser);
-  }
+  if (avatarCache.has(cleanUser)) return avatarCache.get(cleanUser);
 
-  const { data, error } = await db
+  const { data } = await db
     .from('viewers')
     .select('avatar_url')
     .eq('twitch_username', cleanUser)
@@ -30,7 +24,7 @@ async function getAvatar(username) {
   return url;
 }
 
-// --- CONNEXION AU CHAT TWITCH ---
+// --- TWITCH ---
 const client = new tmi.Client({
   channels: [TWITCH_CHANNEL]
 });
@@ -44,7 +38,6 @@ client.on('message', async (channel, tags, message, self) => {
   const color = tags.color || '#a970ff';
   const avatarUrl = await getAvatar(tags.username);
 
-  // Construction de l'élément HTML
   const msgEl = document.createElement('div');
   msgEl.className = 'chat-message';
   msgEl.innerHTML = `
@@ -59,7 +52,6 @@ client.on('message', async (channel, tags, message, self) => {
 
   chatContainer.appendChild(msgEl);
 
-  // Garder au maximum 25 messages affichés à la fois
   if (chatContainer.children.length > 25) {
     chatContainer.removeChild(chatContainer.children[0]);
   }
